@@ -1,0 +1,35 @@
+[project]
+name = "pallas-plugin-dream"
+version = "4.0.0"
+description = "Pallas-Bot 官方扩展：群内做梦与分片漂移。"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.12,<4.0"
+dependencies = [
+    "nonebot2>=2.4.0",
+    "nonebot-adapter-onebot>=2.4.6",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.11.13",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["pallas_plugin_dream"]
+
+[tool.nonebot]
+plugin_dirs = []
+builtin_plugins = []
+
+[tool.nonebot.plugins]
+"@local" = []
+pallas-plugin-dream = ['pallas_plugin_dream']
+
+[tool.nonebot.adapters]
+"@local" = []
+nonebot-adapter-onebot = [{ name = "OneBot V11", module_name = "nonebot.adapters.onebot.v11" }]
