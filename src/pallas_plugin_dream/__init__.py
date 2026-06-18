@@ -8,21 +8,21 @@ from nonebot.exception import ActionFailed
 from nonebot.plugin import PluginMetadata
 from nonebot.rule import Rule
 
-from src.features.cmd_perm.metadata_defaults import (
+from pallas.api.metadata import (
     PLUGIN_EXTRA_VERSION,
     PLUGIN_HOMEPAGE,
     PLUGIN_MENU_TEMPLATE,
 )
-from src.features.cmd_perm.metadata_text import (
+from pallas.api.metadata import (
     SCENE_AUTO,
     SCENE_GROUP,
     join_usage,
     usage_line,
 )
-from src.features.message_scrub import is_message_scrub_blocked_async
-from src.features.message_scrub.log_preview import scrub_intercept_log_preview
-from src.foundation.config import BotConfig, GroupConfig
-from src.platform.ingress.dream_host_gate import dream_session_ingress_passes
+from pallas.api.safety import is_message_scrub_blocked_async
+from pallas.api.safety import scrub_intercept_log_preview
+from pallas.api.config import BotConfig, GroupConfig
+from pallas.api.platform import dream_session_ingress_passes
 
 from . import ban_handlers as _dream_ban_handlers  # noqa: F401 — 注册梦库「不可以」/撤回清理
 from .capture_filter import dream_capture_blocked_by_substrings
@@ -44,7 +44,7 @@ async def _register_dream_plugin_coord() -> None:
         drift_payload_from_dict,
         drift_payload_to_dict,
     )
-    from src.features.plugin_coord.dream import register_dream_coord
+    from pallas.core.plugin_coord.dream import register_dream_coord
 
     register_dream_coord(
         drift_payload_to_dict=drift_payload_to_dict,

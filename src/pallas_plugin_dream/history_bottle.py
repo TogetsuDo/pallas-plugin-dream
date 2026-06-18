@@ -12,7 +12,7 @@ from typing import Literal
 from nonebot import logger
 
 from pallas_plugin_dream.shard_fleet import dream_history_bot_ids
-from src.foundation.db import get_db_backend
+from pallas.core.foundation.db import get_db_backend
 
 from .config import plugin_config
 from .dedupe_keys import dream_image_dedupe_key, dream_text_dedupe_key
@@ -207,7 +207,7 @@ async def sample_historical_drift(
 async def _mongo_pick(
     bot_ids: list[int], exclude_gid: int | None, exclude_send: set[str]
 ) -> DriftPayload | None:
-    from src.foundation.db.modules import Message
+    from pallas.core.foundation.db.modules import Message
 
     coll = Message.get_pymongo_collection()
     now = int(time.time())
@@ -260,7 +260,7 @@ async def _pg_pick(
 ) -> DriftPayload | None:
     from sqlalchemy import func, select
 
-    from src.foundation.db.repository_pg import MessageRow, get_session
+    from pallas.core.foundation.db.repository_pg import MessageRow, get_session
 
     now = int(time.time())
     cutoff = _history_cutoff_ts(now)

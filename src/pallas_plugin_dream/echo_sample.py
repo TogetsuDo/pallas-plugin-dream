@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 
-from src.foundation.db import get_db_backend
+from pallas.core.foundation.db import get_db_backend
 
 from .dream_labels import pick_pseudo_sender_at
 
@@ -19,7 +19,7 @@ async def sample_learned_echo_line() -> str | None:
 
 
 async def _mongo_sample() -> str | None:
-    from src.foundation.db.modules import Context, Message
+    from pallas.core.foundation.db.modules import Context, Message
 
     coll = Context.get_pymongo_collection()
     pipeline = [
@@ -71,7 +71,7 @@ async def _mongo_sample() -> str | None:
 async def _pg_sample() -> str | None:
     from sqlalchemy import func, not_, select
 
-    from src.foundation.db.repository_pg import (
+    from pallas.core.foundation.db.repository_pg import (
         ContextAnswerMessageRow,
         MessageRow,
         get_session,

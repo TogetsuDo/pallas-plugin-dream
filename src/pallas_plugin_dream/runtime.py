@@ -9,9 +9,9 @@ from nonebot import get_bot, logger
 from nonebot.adapters.onebot.v11 import Bot, GroupMessageEvent, Message, MessageSegment
 from nonebot.exception import ActionFailed
 
-from src.foundation.config import BotConfig
-from src.foundation.db import Message as MessageModel
-from src.foundation.db import make_message_repository
+from pallas.api.config import BotConfig
+from pallas.core.foundation.db import Message as MessageModel
+from pallas.core.foundation.db import make_message_repository
 
 from .config import plugin_config as dream_plugin_config
 from .dedupe_keys import dream_image_dedupe_key, dream_text_dedupe_key
@@ -85,12 +85,12 @@ async def stop_dream_worker(bot_id: int, group_id: int) -> None:
             pass
     async with _dream_lock:
         _dream_active.discard(key)
-    from src.platform.ingress.dream_host_gate import DREAM_HOST_GATE_PLUGIN
-    from src.platform.multi_bot.dedup import (
+    from pallas.api.platform import DREAM_HOST_GATE_PLUGIN
+    from pallas.api.platform import (
         needs_group_host_bot_gate,
         release_group_owned_gate_sync,
     )
-    from src.platform.shard.coord.dream_drift import schedule_unregister_dream_active
+    from pallas.core.platform.shard.coord.dream_drift import schedule_unregister_dream_active
 
     schedule_unregister_dream_active(bot_id, group_id)
     if needs_group_host_bot_gate():
@@ -109,7 +109,7 @@ async def broadcast_drift(
 ) -> None:
     """联机梦：仅向「当前也在做梦的其它群」投递；多群时每条随机抽一个接收群。"""
     from pallas_plugin_dream.shard_fleet import collect_drift_peer_group_ids
-    from src.platform.shard.coord.dream_drift import schedule_publish_dream_drift
+    from pallas.core.platform.shard.coord.dream_drift import schedule_publish_dream_drift
 
     async with _dream_lock:
         local_targets = [
@@ -155,12 +155,12 @@ async def launch_dream_worker(bot_id: int, group_id: int, duration_sec: int) -> 
     cfg = BotConfig(bot_id, group_id)
     await cfg.start_dream(duration_sec)
     until_ts = time.time() + max(1, int(duration_sec))
-    from src.platform.ingress.dream_host_gate import DREAM_HOST_GATE_PLUGIN
-    from src.platform.multi_bot.dedup import (
+    from pallas.api.platform import DREAM_HOST_GATE_PLUGIN
+    from pallas.api.platform import (
         bind_group_owned_gate_sync,
         needs_group_host_bot_gate,
     )
-    from src.platform.shard.coord.dream_drift import schedule_register_dream_active
+    from pallas.core.platform.shard.coord.dream_drift import schedule_register_dream_active
 
     schedule_register_dream_active(bot_id, group_id, until_ts)
     if needs_group_host_bot_gate():
@@ -390,12 +390,12 @@ async def _dream_worker_loop(
     finally:
         async with _dream_lock:
             _dream_active.discard(key)
-        from src.platform.ingress.dream_host_gate import DREAM_HOST_GATE_PLUGIN
-        from src.platform.multi_bot.dedup import (
+        from pallas.api.platform import DREAM_HOST_GATE_PLUGIN
+        from pallas.api.platform import (
             needs_group_host_bot_gate,
             release_group_owned_gate_sync,
         )
-        from src.platform.shard.coord.dream_drift import (
+        from pallas.core.platform.shard.coord.dream_drift import (
             schedule_unregister_dream_active,
         )
 

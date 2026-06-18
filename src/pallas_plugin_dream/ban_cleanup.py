@@ -4,7 +4,7 @@ import re
 
 from nonebot import logger
 
-from src.foundation.db import get_db_backend
+from pallas.core.foundation.db import get_db_backend
 
 from .dedupe_keys import dream_text_dedupe_key
 from .history_bottle import DREAM_KEY_PREFIX, dream_history_bot_ids
@@ -55,7 +55,7 @@ async def delete_dream_messages_from_ban_reply(
 
 
 async def _mongo_delete(bot_ids: list[int], raw_norm: str, plains: set[str]) -> int:
-    from src.foundation.db.modules import Message
+    from pallas.core.foundation.db.modules import Message
 
     coll = Message.get_pymongo_collection()
     key_pat = f"^{re.escape(DREAM_KEY_PREFIX)}"
@@ -81,7 +81,7 @@ async def _mongo_delete(bot_ids: list[int], raw_norm: str, plains: set[str]) -> 
 async def _pg_delete(bot_ids: list[int], raw_norm: str, plains: set[str]) -> int:
     from sqlalchemy import delete, or_
 
-    from src.foundation.db.repository_pg import MessageRow, get_session
+    from pallas.core.foundation.db.repository_pg import MessageRow, get_session
 
     if not plains and not (raw_norm or "").strip():
         return 0
