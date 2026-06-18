@@ -1,6 +1,6 @@
 [project]
 name = "pallas-plugin-dream"
-version = "4.0.2"
+version = "4.0.3"
 description = "Pallas-Bot 官方扩展：群内做梦与分片漂移。"
 readme = "README.md"
 license = { file = "LICENSE" }
