@@ -47,7 +47,12 @@ async def _mongo_sample() -> str | None:
     try:
         mc = Message.get_pymongo_collection()
         pipe2 = [
-            {"$match": {"is_plain_text": True, "plain_text": {"$regex": r"^.{2,200}$"}}},
+            {
+                "$match": {
+                    "is_plain_text": True,
+                    "plain_text": {"$regex": r"^.{2,200}$"},
+                }
+            },
             {"$sample": {"size": 1}},
             {"$project": {"_id": 0, "t": "$plain_text"}},
         ]
@@ -66,7 +71,11 @@ async def _mongo_sample() -> str | None:
 async def _pg_sample() -> str | None:
     from sqlalchemy import func, not_, select
 
-    from src.foundation.db.repository_pg import ContextAnswerMessageRow, MessageRow, get_session
+    from src.foundation.db.repository_pg import (
+        ContextAnswerMessageRow,
+        MessageRow,
+        get_session,
+    )
 
     try:
         async with get_session() as session:

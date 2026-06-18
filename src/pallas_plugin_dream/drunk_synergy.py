@@ -52,7 +52,9 @@ async def _mongo_pick_random_user(bot_id: int, group_id: int) -> int | None:
     try:
         docs = [d async for d in coll.aggregate(pipeline)]
     except Exception as e:
-        logger.debug(f"bot [{bot_id}] drunk synergy mongo pick user failed in group [{group_id}]: {e}")
+        logger.debug(
+            f"bot [{bot_id}] drunk synergy mongo pick user failed in group [{group_id}]: {e}"
+        )
         return None
     if not docs:
         return None
@@ -82,14 +84,18 @@ async def _pg_pick_random_user(bot_id: int, group_id: int) -> int | None:
             r = await session.execute(stmt)
             rows = [row[0] for row in r.all()]
     except Exception as e:
-        logger.debug(f"bot [{bot_id}] drunk synergy pg pick user failed in group [{group_id}]: {e}")
+        logger.debug(
+            f"bot [{bot_id}] drunk synergy pg pick user failed in group [{group_id}]: {e}"
+        )
         return None
     if not rows:
         return None
     return int(random.choice(rows))
 
 
-async def sample_user_non_dream_plain_line(*, bot_id: int, group_id: int, user_id: int) -> str | None:
+async def sample_user_non_dream_plain_line(
+    *, bot_id: int, group_id: int, user_id: int
+) -> str | None:
     backend = get_db_backend()
     if backend == "mongodb":
         return await _mongo_pick_plain_line(bot_id, group_id, user_id)
@@ -98,7 +104,9 @@ async def sample_user_non_dream_plain_line(*, bot_id: int, group_id: int, user_i
     return None
 
 
-async def _mongo_pick_plain_line(bot_id: int, group_id: int, user_id: int) -> str | None:
+async def _mongo_pick_plain_line(
+    bot_id: int, group_id: int, user_id: int
+) -> str | None:
     from src.foundation.db.modules import Message
 
     coll = Message.get_pymongo_collection()
@@ -114,7 +122,9 @@ async def _mongo_pick_plain_line(bot_id: int, group_id: int, user_id: int) -> st
     try:
         docs = [d async for d in coll.aggregate(pipeline)]
     except Exception as e:
-        logger.debug(f"bot [{bot_id}] drunk synergy mongo pick line failed in group [{group_id}]: {e}")
+        logger.debug(
+            f"bot [{bot_id}] drunk synergy mongo pick line failed in group [{group_id}]: {e}"
+        )
         return None
     random.shuffle(docs)
     for doc in docs:
@@ -149,7 +159,9 @@ async def _pg_pick_plain_line(bot_id: int, group_id: int, user_id: int) -> str |
             r = await session.execute(stmt)
             rows = list(r.all())
     except Exception as e:
-        logger.debug(f"bot [{bot_id}] drunk synergy pg pick line failed in group [{group_id}]: {e}")
+        logger.debug(
+            f"bot [{bot_id}] drunk synergy pg pick line failed in group [{group_id}]: {e}"
+        )
         return None
     random.shuffle(rows)
     for plain, keywords in rows:
@@ -163,7 +175,9 @@ async def _pg_pick_plain_line(bot_id: int, group_id: int, user_id: int) -> str |
     return None
 
 
-async def try_drunk_dream_take_name(*, bot: Bot, bot_id: int, group_id: int, cfg: BotConfig) -> tuple[int, str] | None:
+async def try_drunk_dream_take_name(
+    *, bot: Bot, bot_id: int, group_id: int, cfg: BotConfig
+) -> tuple[int, str] | None:
     if not await is_bot_admin(bot_id, group_id, True):
         return None
     uid = await pick_random_member_user_id(bot_id=bot_id, group_id=group_id)
@@ -176,7 +190,9 @@ async def try_drunk_dream_take_name(*, bot: Bot, bot_id: int, group_id: int, cfg
         )
     except ActionFailed:
         return None
-    victim_label = (info.get("card") or info.get("nickname") or str(uid)).strip() or str(uid)
+    victim_label = (
+        info.get("card") or info.get("nickname") or str(uid)
+    ).strip() or str(uid)
     try:
         await bot.call_api(
             "set_group_card",
@@ -184,11 +200,17 @@ async def try_drunk_dream_take_name(*, bot: Bot, bot_id: int, group_id: int, cfg
         )
         await bot.call_api(
             "set_group_card",
-            **{"group_id": group_id, "user_id": uid, "card": random.choice(_TAKE_NAME_CARDS)},
+            **{
+                "group_id": group_id,
+                "user_id": uid,
+                "card": random.choice(_TAKE_NAME_CARDS),
+            },
         )
         await cfg.update_taken_name(uid)
     except ActionFailed as e:
-        logger.debug(f"bot [{bot_id}] dream drunk take_name ActionFailed in group [{group_id}]: {e}")
+        logger.debug(
+            f"bot [{bot_id}] dream drunk take_name ActionFailed in group [{group_id}]: {e}"
+        )
         return None
     return (uid, victim_label)
 
@@ -201,9 +223,13 @@ async def send_one_random_history_line(
     user_id: int,
     display_name: str | None = None,
 ) -> None:
-    line = await sample_user_non_dream_plain_line(bot_id=bot_id, group_id=group_id, user_id=user_id)
+    line = await sample_user_non_dream_plain_line(
+        bot_id=bot_id, group_id=group_id, user_id=user_id
+    )
     if not line:
         return
     nick = (display_name or "").strip() or str(user_id)
     body = f"{drift_style_at(nick)}：{line}"
-    await bot.send_group_msg(group_id=group_id, message=Message(MessageSegment.text(body)))
+    await bot.send_group_msg(
+        group_id=group_id, message=Message(MessageSegment.text(body))
+    )

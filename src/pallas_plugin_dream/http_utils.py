@@ -11,7 +11,9 @@ async def download_image_url(url: str) -> bytes | None:
     if not u.startswith(("http://", "https://")):
         return None
     try:
-        async with httpx.AsyncClient(timeout=httpx.Timeout(30.0), trust_env=True) as client:
+        async with httpx.AsyncClient(
+            timeout=httpx.Timeout(30.0), trust_env=True
+        ) as client:
             r = await client.get(u)
             if r.status_code != 200:
                 return None

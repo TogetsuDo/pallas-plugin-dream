@@ -90,8 +90,12 @@ class _HistPick:
     image_url: str | None = None
 
 
-def _build_hist_pick_from_fields(time_v: int, keywords: str, plain: str, raw: str) -> _HistPick | None:
-    nick = dream_display_name_from_keywords(keywords if isinstance(keywords, str) else "")
+def _build_hist_pick_from_fields(
+    time_v: int, keywords: str, plain: str, raw: str
+) -> _HistPick | None:
+    nick = dream_display_name_from_keywords(
+        keywords if isinstance(keywords, str) else ""
+    )
     p = (plain or "").strip()
     rs = raw or ""
     if len(p) >= 2:
@@ -126,7 +130,10 @@ async def _pick_payload_from_cands(
     for _ in range(max_tries):
         if not pool:
             break
-        ws = [_recency_weight(use[i].time, cutoff=cutoff, now=now, power=power) for i in pool]
+        ws = [
+            _recency_weight(use[i].time, cutoff=cutoff, now=now, power=power)
+            for i in pool
+        ]
         rj = _weighted_pick_index(ws)
         idx = pool.pop(rj)
         c = use[idx]
@@ -161,7 +168,9 @@ def dream_display_name_from_keywords(keywords: str) -> str:
 
 
 def dream_keywords_for_insert(display_name: str) -> str:
-    safe = (display_name or "").replace(DREAM_RECORD_SEP, " ").replace("\n", " ").strip() or "某位博士"
+    safe = (display_name or "").replace(DREAM_RECORD_SEP, " ").replace(
+        "\n", " "
+    ).strip() or "某位博士"
     return f"{DREAM_KEY_PREFIX}{DREAM_RECORD_SEP}{safe[:120]}"
 
 
@@ -195,7 +204,9 @@ async def sample_historical_drift(
     return None
 
 
-async def _mongo_pick(bot_ids: list[int], exclude_gid: int | None, exclude_send: set[str]) -> DriftPayload | None:
+async def _mongo_pick(
+    bot_ids: list[int], exclude_gid: int | None, exclude_send: set[str]
+) -> DriftPayload | None:
     from src.foundation.db.modules import Message
 
     coll = Message.get_pymongo_collection()
@@ -216,7 +227,9 @@ async def _mongo_pick(bot_ids: list[int], exclude_gid: int | None, exclude_send:
     try:
         docs = [d async for d in coll.aggregate(pipeline)]
     except Exception as e:
-        logger.debug(f"bot [{bot_ids[0]}] dream history sample mongo aggregate failed: {e}")
+        logger.debug(
+            f"bot [{bot_ids[0]}] dream history sample mongo aggregate failed: {e}"
+        )
         return None
     cands: list[_HistPick] = []
     for doc in docs:
@@ -234,13 +247,17 @@ async def _mongo_pick(bot_ids: list[int], exclude_gid: int | None, exclude_send:
             cands.append(hp)
     power = float(plugin_config.dream_history_recency_power)
     try:
-        return await _pick_payload_from_cands(cands, exclude_send, cutoff=cutoff, now=now, power=power)
+        return await _pick_payload_from_cands(
+            cands, exclude_send, cutoff=cutoff, now=now, power=power
+        )
     except Exception as e:
         logger.debug(f"bot [{bot_ids[0]}] dream history sample mongo pick failed: {e}")
         return None
 
 
-async def _pg_pick(bot_ids: list[int], exclude_gid: int | None, exclude_send: set[str]) -> DriftPayload | None:
+async def _pg_pick(
+    bot_ids: list[int], exclude_gid: int | None, exclude_send: set[str]
+) -> DriftPayload | None:
     from sqlalchemy import func, select
 
     from src.foundation.db.repository_pg import MessageRow, get_session
@@ -251,25 +268,36 @@ async def _pg_pick(bot_ids: list[int], exclude_gid: int | None, exclude_send: se
     try:
         async with get_session() as session:
             stmt = (
-                select(MessageRow.time, MessageRow.plain_text, MessageRow.keywords, MessageRow.raw_message)
+                select(
+                    MessageRow.time,
+                    MessageRow.plain_text,
+                    MessageRow.keywords,
+                    MessageRow.raw_message,
+                )
                 .where(MessageRow.bot_id.in_(bot_ids))
                 .where(MessageRow.time >= cutoff)
                 .where(MessageRow.keywords.startswith(DREAM_KEY_PREFIX))
             )
             if exclude_gid is not None:
                 stmt = stmt.where(MessageRow.group_id != exclude_gid)
-            r = await session.execute(stmt.order_by(func.random()).limit(_HIST_SAMPLE_SIZE))
+            r = await session.execute(
+                stmt.order_by(func.random()).limit(_HIST_SAMPLE_SIZE)
+            )
             rows = list(r.all())
     except Exception as e:
         logger.debug(f"bot [{bot_ids[0]}] dream history sample pg query failed: {e}")
         return None
     cands: list[_HistPick] = []
     for tv, plain, keywords, raw in rows:
-        hp = _build_hist_pick_from_fields(int(tv or 0), keywords or "", plain or "", raw or "")
+        hp = _build_hist_pick_from_fields(
+            int(tv or 0), keywords or "", plain or "", raw or ""
+        )
         if hp is not None:
             cands.append(hp)
     try:
-        return await _pick_payload_from_cands(cands, exclude_send, cutoff=cutoff, now=now, power=power)
+        return await _pick_payload_from_cands(
+            cands, exclude_send, cutoff=cutoff, now=now, power=power
+        )
     except Exception as e:
         logger.debug(f"bot [{bot_ids[0]}] dream history sample pg pick failed: {e}")
         return None

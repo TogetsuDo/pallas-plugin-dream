@@ -40,7 +40,9 @@ def dream_ban_plain_variants(plain: str) -> set[str]:
     return {x for x in out if x}
 
 
-async def delete_dream_messages_from_ban_reply(*, bot_id: int, reply_cq_raw: str, reply_plain: str) -> int:
+async def delete_dream_messages_from_ban_reply(
+    *, bot_id: int, reply_cq_raw: str, reply_plain: str
+) -> int:
     raw_norm = strip_cq_image_urls(reply_cq_raw or "")
     plains = dream_ban_plain_variants(reply_plain)
     bot_ids = dream_history_bot_ids(bot_id)
@@ -70,7 +72,9 @@ async def _mongo_delete(bot_ids: list[int], raw_norm: str, plains: set[str]) -> 
         r = await coll.delete_many(q)
         return int(r.deleted_count)
     except Exception as e:
-        logger.debug(f"bot [{bot_ids[0]}] dream ban cleanup mongo delete_many failed: {e}")
+        logger.debug(
+            f"bot [{bot_ids[0]}] dream ban cleanup mongo delete_many failed: {e}"
+        )
         return 0
 
 
