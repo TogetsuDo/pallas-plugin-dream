@@ -23,6 +23,7 @@ from pallas.api.safety import is_message_scrub_blocked_async
 from pallas.api.safety import scrub_intercept_log_preview
 from pallas.api.config import BotConfig, GroupConfig
 from pallas.api.platform import dream_session_ingress_passes
+from pallas.product.llm.knowledge.declare import knowledge_source_row
 
 from . import ban_handlers as _dream_ban_handlers  # noqa: F401 — 注册梦库「不可以」/撤回清理
 from .capture_filter import dream_capture_blocked_by_substrings
@@ -111,6 +112,39 @@ __plugin_meta__ = PluginMetadata(
                 "brief_des": "删除梦库中匹配内容",
                 "detail_des": "与复读「不可以」相同：回复目标消息后 @牛牛 说「不可以」。",
             },
+        ],
+        "knowledge_sources": [
+            knowledge_source_row(
+                source_id="dream.faq",
+                title="牛牛做梦说明",
+                description="跨群梦话漂流",
+                chunks=[
+                    {
+                        "title": "如何做梦",
+                        "content": (
+                            "发送「牛牛做梦」进入约 5～15 分钟的做梦状态；"
+                            "可收到他群漂流、历史梦话或图片，醉酒时梦话更密。"
+                        ),
+                        "keywords": "做梦,梦话,漂流,怎么做梦",
+                    },
+                    {
+                        "title": "如何醒梦",
+                        "content": (
+                            "发送「牛牛醒梦」或「牛牛别做梦」结束做梦；"
+                            "「牛牛醒一醒」醒酒时也会一并醒梦。"
+                        ),
+                        "keywords": "醒梦,别做梦,醒一醒,结束",
+                    },
+                    {
+                        "title": "梦库清理",
+                        "content": (
+                            "回复某条消息后 @牛牛 说「不可以」，"
+                            "可删除梦库中匹配内容（群管向）。"
+                        ),
+                        "keywords": "不可以,清理,删除,梦库",
+                    },
+                ],
+            ),
         ],
     },
 )
