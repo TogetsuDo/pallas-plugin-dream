@@ -75,6 +75,9 @@ __plugin_meta__ = PluginMetadata(
                 "default": "staff",
             },
         ],
+        "command_limits": [
+            {"id": "dream.ban_cleanup", "cd_sec": 3},
+        ],
         "menu_data": [
             {
                 "func": "牛牛做梦",
