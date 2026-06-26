@@ -35,7 +35,9 @@ async def collect_drift_peer_group_ids(
     """联机梦漂流目标：本进程活跃群 + 分片时其它 worker 上的同行群。"""
     targets = set(local_targets)
     if shard_ctx.sharding_active():
-        from pallas.core.platform.shard.coord.dream_drift import list_peer_dream_groups_sync
+        from pallas.core.platform.shard.coord.dream_drift import (
+            list_peer_dream_groups_sync,
+        )
 
         remote_targets = await asyncio.to_thread(
             list_peer_dream_groups_sync,

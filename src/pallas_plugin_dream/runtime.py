@@ -90,7 +90,9 @@ async def stop_dream_worker(bot_id: int, group_id: int) -> None:
         needs_group_host_bot_gate,
         release_group_owned_gate_sync,
     )
-    from pallas.core.platform.shard.coord.dream_drift import schedule_unregister_dream_active
+    from pallas.core.platform.shard.coord.dream_drift import (
+        schedule_unregister_dream_active,
+    )
 
     schedule_unregister_dream_active(bot_id, group_id)
     if needs_group_host_bot_gate():
@@ -109,7 +111,9 @@ async def broadcast_drift(
 ) -> None:
     """联机梦：仅向「当前也在做梦的其它群」投递；多群时每条随机抽一个接收群。"""
     from pallas_plugin_dream.shard_fleet import collect_drift_peer_group_ids
-    from pallas.core.platform.shard.coord.dream_drift import schedule_publish_dream_drift
+    from pallas.core.platform.shard.coord.dream_drift import (
+        schedule_publish_dream_drift,
+    )
 
     async with _dream_lock:
         local_targets = [
@@ -160,7 +164,9 @@ async def launch_dream_worker(bot_id: int, group_id: int, duration_sec: int) -> 
         bind_group_owned_gate_sync,
         needs_group_host_bot_gate,
     )
-    from pallas.core.platform.shard.coord.dream_drift import schedule_register_dream_active
+    from pallas.core.platform.shard.coord.dream_drift import (
+        schedule_register_dream_active,
+    )
 
     schedule_register_dream_active(bot_id, group_id, until_ts)
     if needs_group_host_bot_gate():
